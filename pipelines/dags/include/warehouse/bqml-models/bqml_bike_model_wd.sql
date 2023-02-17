@@ -6,14 +6,14 @@ options
 select
   duration,
   start_station_name,
-if
-  (extract(dayofweek
-    from
-      start_date) between 2 and 6,
+if(
+    extract(dayofweek from start_date) between 2 and 6,
     'weekday',
-    'weekend') as dayofweek,
-  cast(extract(hour
-    from
-      start_date) as string) as hourofday
+    'weekend'
+  ) as day_of_week,
+  cast(
+    extract(hour from start_date) 
+    as string
+  ) as hour_of_day
 from
   `bigquery-public-data`.london_bicycles.cycle_hire

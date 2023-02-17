@@ -18,10 +18,12 @@ bq_conn_id = Variable.get("bq_conn_id")
 bq_dataset = Variable.get("bq_dataset")
 model_name = "model"
 model_name_wd = "model_wd"
+model_name_bucketed = "model_bucketed"
 
 dag_params = {
     "target_model_name": f"`{bq_dataset}.{model_name}`",
     "target_model_name_wd": f"`{bq_dataset}.{model_name_wd}`",
+    "target_model_name_bucketed": f"`{bq_dataset}.{model_name_bucketed}"
 }
 # endregion Connections/variables
 
@@ -50,6 +52,13 @@ with DAG(
         sql="warehouse/bqml-models/bqml_bike_model_wd.sql"
     )
 
+    bq_create_model_bucketed_task = BigQueryExecuteQueryOperator(
+        task_id="load_model_bucketed",
+        gcp_conn_id=bq_conn_id,
+        use_legacy_sql=False,
+        sql="warehouse/bqml-models/bqml_bike_model_bucketed.sql"
+    )
+
     # endregion Tasks
 
-    bq_create_model_task >> bq_create_model_wd_task
+    bq_create_model_task >> bq_create_model_wd_task >> bq_create_model_bucketed_task
